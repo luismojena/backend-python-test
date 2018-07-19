@@ -1,4 +1,5 @@
 from flask import session, redirect, g
+from functools import wraps
 
 
 class TodoManager:
@@ -28,8 +29,24 @@ class TodoManager:
         )
         g.db.commit()
 
+    @staticmethod
+    def uncomplete(id):
+        TodoManager._update_completed(id, 0)
+
+    @staticmethod
+    def complete(id):
+        TodoManager._update_completed(id, 1)
+
+    @staticmethod
+    def _update_completed(id, value):
+        g.db.execute(
+            "UPDATE todos SET completed = %s WHERE id = '%s'" % (value, id)
+        )
+        g.db.commit()
+
 
 def logged_in(f):
+    @wraps(f)
     def _wrapper(*args, **kwargs):
         if not session.get('logged_in'):
             return redirect('/login')

@@ -7,15 +7,33 @@
             <th>#</th>
             <th>User</th>
             <th>Description</th>
+            <th>Completed</th>
             <th></th>
             {% for todo in todos %}
                 <tr>
                     <td>{{ todo.id }}</td>
                     <td>{{ todo.user_id }}</td>
                     <td>
-                        <a href="{{ url_for('todo', id=todo.id) }}">
+                        <a
+                                {% if todo.completed == 1 %}
+                                    style="text-decoration: line-through;"
+                                {% else %}
+                                    style="text-decoration: none;"
+                                {% endif %}
+                                    href="{{ url_for('todo', id=todo.id) }}">
                             {{ todo.description }}
                         </a>
+                    </td>
+                    <td>
+                        {% if todo.completed == 1 %}
+                            <form method="post" action="{{ url_for('uncomplete_todo', id=todo.id) }}">
+                                <button type="submit" class="btn btn-xs btn-danger">Uncomplete</button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{{ url_for('complete_todo', id=todo.id) }}">
+                                <button type="submit" class="btn btn-xs btn-success">Complete</button>
+                            </form>
+                        {% endif %}
                     </td>
                     <td>
                         <form method="post" action="{{ url_for('todo_delete', id=todo.id) }}">

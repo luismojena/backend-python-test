@@ -1,5 +1,5 @@
 from alayatodo import app
-from .core import TodoManager
+from .core import TodoManager, logged_in
 from flask import (
     g,
     redirect,
@@ -7,6 +7,8 @@ from flask import (
     request,
     session
 )
+
+import json
 
 
 @app.route('/')
@@ -47,27 +49,24 @@ def logout():
 
 # security fix: Unauthenticated user can get a todo by its id
 @app.route('/todo/<id>', methods=['GET'])
+@logged_in
 def todo(id):
-    if not session.get('logged_in'):
-        return redirect('/login')
     todo = TodoManager.get_one_by_id(id)
     return render_template('todo.html', todo=todo)
 
 
 @app.route('/todo', methods=['GET'])
 @app.route('/todo/', methods=['GET'])
+@logged_in
 def todos():
-    if not session.get('logged_in'):
-        return redirect('/login')
     todos = TodoManager.get_all()
     return render_template('todos.html', todos=todos, validation_errors=g.validation_errors)
 
 
 @app.route('/todo', methods=['POST'])
 @app.route('/todo/', methods=['POST'])
+@logged_in
 def todos_POST():
-    if not session.get('logged_in'):
-        return redirect('/login')
     description = g.validators.validate_not_empty_field(request.form.get('description', ''), 'description')
 
     if description is not None:
@@ -81,8 +80,21 @@ def todos_POST():
 
 
 @app.route('/todo/<id>', methods=['POST'])
+@logged_in
 def todo_delete(id):
-    if not session.get('logged_in'):
-        return redirect('/login')
     TodoManager.delete_by_id(id)
     return redirect('/todo')
+
+
+@app.route('/todo/uncomplete/<id>', methods=['POST'])
+@logged_in
+def uncomplete_todo(id):
+    TodoManager.uncomplete(id)
+    return redirect(request.referrer)
+
+
+@app.route('/todo/complete/<id>', methods=['POST'])
+@logged_in
+def complete_todo(id):
+    TodoManager.complete(id)
+    return redirect(request.referrer)
