@@ -1,3 +1,5 @@
+import json
+
 from alayatodo import app
 from .core import TodoManager, logged_in
 from flask import (
@@ -8,7 +10,7 @@ from flask import (
     session
 )
 
-import json
+from .core import MessageType
 
 
 @app.route('/')
@@ -60,7 +62,7 @@ def todo(id):
 @logged_in
 def todos():
     todos = TodoManager.get_all()
-    return render_template('todos.html', todos=todos, validation_errors=g.validation_errors)
+    return render_template('todos.html', todos=todos, messages=g.messages)
 
 
 @app.route('/todo', methods=['POST'])
@@ -71,19 +73,19 @@ def todos_POST():
 
     if description is not None:
         TodoManager.insert(description)
+        g.messages.append({'text': 'Todo added correctly.', 'type': MessageType.Information})
 
-    if g.validation_dirty:
-        todos = TodoManager.get_all()
-        return render_template('todos.html', todos=todos, validation_errors=g.validation_errors)
-    else:
-        return redirect('/todo')
+    todos = TodoManager.get_all()
+    return render_template('todos.html', todos=todos, messages=g.messages)
 
 
 @app.route('/todo/<id>', methods=['POST'])
 @logged_in
 def todo_delete(id):
     TodoManager.delete_by_id(id)
-    return redirect('/todo')
+    g.messages.append({'text': 'Todo removed correctly.', 'type': MessageType.Information})
+    todos = TodoManager.get_all()
+    return render_template('todos.html', todos=todos, messages=g.messages)
 
 
 @app.route('/todo/uncomplete/<id>', methods=['POST'])

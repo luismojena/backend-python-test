@@ -1,6 +1,13 @@
 {% extends "layout.html" %}
 
 {% block content %}
+    <div>
+        {% for message in messages %}
+            {% if message.type == 2 %}
+                <span class="message information-message">{{ message.text }}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
     <div class="col-md-4 col-md-offset-4">
         <h1>Todo List:</h1>
         <table class="table table-striped">
@@ -46,8 +53,10 @@
             <tr>
                 <div>
                     <ul class="errors">
-                        {% for error in validation_errors %}
-                            <li>{{ error }}</li>
+                        {% for error in messages %}
+                            {% if error.type == 1 %}
+                                <li>{{ error.text }}</li>
+                            {% endif %}
                         {% endfor %}
                     </ul>
                 </div>

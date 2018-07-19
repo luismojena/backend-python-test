@@ -1,9 +1,9 @@
 from flask import g
+from .core import MessageType
 
 
 def add_validation_message(message):
-    g.validation_errors.append(message)
-    g.validation_dirty = True
+    g.messages.append({'text': message, 'type': MessageType.Error})
 
 
 class validators:

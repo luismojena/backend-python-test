@@ -23,8 +23,7 @@ def connect_db():
 def before_request():
     g.db = connect_db()
     g.validators = validators
-    g.validation_errors = []
-    g.validation_dirty = False
+    g.messages = []
 
 
 @app.teardown_request

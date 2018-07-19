@@ -2,6 +2,11 @@ from flask import session, redirect, g
 from functools import wraps
 
 
+class MessageType:
+    Error = 1
+    Information = 2
+
+
 class TodoManager:
 
     @staticmethod
