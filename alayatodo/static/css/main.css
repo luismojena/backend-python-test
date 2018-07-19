@@ -1,7 +1,12 @@
 body {
-  padding-top: 50px;
+    padding-top: 50px;
 }
 
 .login-form > div {
     margin-top: 10px;
+}
+
+.errors {
+    color: red;
+    text-decoration: none;
 }

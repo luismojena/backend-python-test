@@ -1,5 +1,6 @@
 from flask import Flask, g
 import sqlite3
+from validators import validators
 
 # configuration
 DATABASE = '/tmp/alayatodo.db'
@@ -7,7 +8,6 @@ DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
-
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -22,6 +22,9 @@ def connect_db():
 @app.before_request
 def before_request():
     g.db = connect_db()
+    g.validators = validators
+    g.validation_errors = []
+    g.validation_dirty = False
 
 
 @app.teardown_request

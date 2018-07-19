@@ -1,11 +1,12 @@
 from alayatodo import app
+from .core import TodoManager
 from flask import (
     g,
     redirect,
     render_template,
     request,
     session
-    )
+)
 
 
 @app.route('/')
@@ -25,7 +26,8 @@ def login_POST():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'";
+    sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'"
+    print sql % (username, password)
     cur = g.db.execute(sql % (username, password))
     user = cur.fetchone()
     if user:
@@ -43,10 +45,12 @@ def logout():
     return redirect('/')
 
 
+# security fix: Unauthenticated user can get a todo by its id
 @app.route('/todo/<id>', methods=['GET'])
 def todo(id):
-    cur = g.db.execute("SELECT * FROM todos WHERE id ='%s'" % id)
-    todo = cur.fetchone()
+    if not session.get('logged_in'):
+        return redirect('/login')
+    todo = TodoManager.get_one_by_id(id)
     return render_template('todo.html', todo=todo)
 
 
@@ -55,9 +59,8 @@ def todo(id):
 def todos():
     if not session.get('logged_in'):
         return redirect('/login')
-    cur = g.db.execute("SELECT * FROM todos")
-    todos = cur.fetchall()
-    return render_template('todos.html', todos=todos)
+    todos = TodoManager.get_all()
+    return render_template('todos.html', todos=todos, validation_errors=g.validation_errors)
 
 
 @app.route('/todo', methods=['POST'])
@@ -65,18 +68,21 @@ def todos():
 def todos_POST():
     if not session.get('logged_in'):
         return redirect('/login')
-    g.db.execute(
-        "INSERT INTO todos (user_id, description) VALUES ('%s', '%s')"
-        % (session['user']['id'], request.form.get('description', ''))
-    )
-    g.db.commit()
-    return redirect('/todo')
+    description = g.validators.validate_not_empty_field(request.form.get('description', ''), 'description')
+
+    if description is not None:
+        TodoManager.insert(description)
+
+    if g.validation_dirty:
+        todos = TodoManager.get_all()
+        return render_template('todos.html', todos=todos, validation_errors=g.validation_errors)
+    else:
+        return redirect('/todo')
 
 
 @app.route('/todo/<id>', methods=['POST'])
 def todo_delete(id):
     if not session.get('logged_in'):
         return redirect('/login')
-    g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
-    g.db.commit()
+    TodoManager.delete_by_id(id)
     return redirect('/todo')
