@@ -13,6 +13,26 @@ from flask import (
 from .core import MessageType
 
 
+def get_pagination():
+    page = int(request.values.get('page', 0))
+    quantity = int(request.values.get('quantity', 5))
+    todos = TodoManager.paginate(page, quantity)
+    total = TodoManager.count()
+    prev_ = [i for i in range(page - 1, page - 3, -1) if i >= 0]
+    prev_.reverse()
+    paginator = {
+        'prev': page - 1 if page > 0 else page,
+        'last': total / quantity,
+        'current': page,
+        'next': page + 1 if page < total / quantity else page,
+        'prev_': prev_,
+        'next_': [i for i in range(page + 1, page + 3) if i <= total / quantity],
+        'quantity': quantity
+    }
+
+    return todos, paginator
+
+
 @app.route('/')
 def home():
     with app.open_resource('../README.md', mode='r') as f:
@@ -61,8 +81,8 @@ def todo(id):
 @app.route('/todo/', methods=['GET'])
 @logged_in
 def todos():
-    todos = TodoManager.get_all()
-    return render_template('todos.html', todos=todos, messages=g.messages)
+    todos, paginator = get_pagination()
+    return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
 @app.route('/todo', methods=['POST'])
@@ -75,8 +95,9 @@ def todos_POST():
         TodoManager.insert(description)
         g.messages.append({'text': 'Todo added correctly.', 'type': MessageType.Information})
 
-    todos = TodoManager.get_all()
-    return render_template('todos.html', todos=todos, messages=g.messages)
+    todos, paginator = get_pagination()
+
+    return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
 @app.route('/todo/<id>', methods=['POST'])
@@ -84,8 +105,8 @@ def todos_POST():
 def todo_delete(id):
     TodoManager.delete_by_id(id)
     g.messages.append({'text': 'Todo removed correctly.', 'type': MessageType.Information})
-    todos = TodoManager.get_all()
-    return render_template('todos.html', todos=todos, messages=g.messages)
+    todos, paginator = get_pagination()
+    return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
 @app.route('/todo/uncomplete/<id>', methods=['POST'])

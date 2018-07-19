@@ -49,6 +49,19 @@ class TodoManager:
         )
         g.db.commit()
 
+    @staticmethod
+    def paginate(page, quantity):
+        pivot = page * quantity
+        cur = g.db.execute("SELECT * FROM todos ORDER BY id LIMIT '%s', '%s'" % (pivot, quantity))
+        todos = cur.fetchall()
+        return todos
+
+    @staticmethod
+    def count():
+        cur = g.db.execute("SELECT COUNT(*) FROM todos")
+        todos = cur.fetchone()[0]
+        return todos
+
 
 def logged_in(f):
     @wraps(f)

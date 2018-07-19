@@ -4,7 +4,9 @@
     <div>
         {% for message in messages %}
             {% if message.type == 2 %}
-                <span class="message information-message">{{ message.text }}</span>
+                <div class="alert alert-info information-message" role="alert">
+                    {{ message.text }}
+                </div>
             {% endif %}
         {% endfor %}
     </div>
@@ -51,6 +53,48 @@
                 </tr>
             {% endfor %}
             <tr>
+                <td colspan="4">
+                    <div>
+                        <a href="/todo?page={{ paginator.prev }}&quantity={{ paginator.quantity }}">Prev</a>
+                        {% for k in paginator.keys() %}
+                            {% if k == 'prev_' %}
+                                {% for pr in paginator[k] %}
+                                    <a class="paginator-page"
+                                       href="/todo?page={{ pr }}&quantity={{ paginator.quantity }}">
+                                        {{ pr  }}</a>
+                                {% endfor %}
+                            {% endif %}
+                            {% if k == 'current' %}
+                                <a href="#" class="paginator-current">{{ paginator[k]  }}</a>
+                            {% endif %}
+                            {% if k == 'next_' %}
+                                {% for nx in paginator[k] %}
+                                    <a class="paginator-page"
+                                       href="/todo?page={{ nx }}&quantity={{ paginator.quantity }}">
+                                        {{ nx  }}</a>
+                                {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                        ...
+                        <a href="/todo?page={{ paginator.last }}&quantity={{ paginator.quantity }}">Last</a>
+                        <a href="/todo?page={{ paginator.next }}&quantity={{ paginator.quantity }}">Next</a>
+                    </div>
+                </td>
+                <td colspan="1">
+                    <div class="small-6 small-center">
+                        <form method="get" action="{{ url_for('todos') }}" id="paginator-selector-form">
+                            <select name="quantity" id="paginator-selector">
+                                <option value="5" {% if paginator.quantity == 5 %}selected{% endif %}>5</option>
+                                <option value="10" {% if paginator.quantity == 10 %}selected{% endif %}>10</option>
+                                <option value="20" {% if paginator.quantity == 20 %}selected{% endif %}>20</option>
+                                <option value="50" {% if paginator.quantity == 50 %}selected{% endif %}>50</option>
+                                <option value="100" {% if paginator.quantity == 100 %}selected{% endif %}>100</option>
+                            </select>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr>
                 <div>
                     <ul class="errors">
                         {% for error in messages %}
@@ -60,10 +104,12 @@
                         {% endfor %}
                     </ul>
                 </div>
-                <form method="post" action="{{ url_for('todos_POST') }}">
+                <form method="post" action="{{ url_for('todos_POST') }}" id="add-todo-form">
                     <td colspan="3">
                         <input type="textbox" name="description" class="small-6 small-center"
                                placeholder="Description...">
+                        <input type="hidden" value="{{ paginator.current }}" name="page">
+                        <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
                     </td>
                     <td>
                         <button type="submit" class="btn btn-sm btn-primary">Add</button>

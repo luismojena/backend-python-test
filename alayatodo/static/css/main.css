@@ -10,3 +10,11 @@ body {
     color: red;
     text-decoration: none;
 }
+
+.paginator-current {
+    color: darkred;
+}
+
+.paginator-page {
+    text-decoration: none;
+}
