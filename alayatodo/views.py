@@ -98,3 +98,10 @@ def uncomplete_todo(id):
 def complete_todo(id):
     TodoManager.complete(id)
     return redirect(request.referrer)
+
+
+@app.route('/todo/<id>/json', methods=['GET'])
+@logged_in
+def todo_to_json(id):
+    todo = TodoManager.get_one_by_id(id)
+    return json.dumps(dict(todo))
