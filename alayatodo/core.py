@@ -17,7 +17,7 @@ class TodoManager:
 
     @staticmethod
     def get_one_by_id(id):
-        todo = Todo.query.get_or_404(id)
+        todo = Todo.query.get(id)
         return todo
 
     @staticmethod

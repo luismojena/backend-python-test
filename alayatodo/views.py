@@ -6,7 +6,8 @@ from flask import (
     redirect,
     render_template,
     request,
-    session
+    session,
+    jsonify
 )
 
 
@@ -125,4 +126,6 @@ def complete_todo(id):
 @logged_in
 def todo_to_json(id):
     todo = TodoManager.get_one_by_id(id)
-    return todo.to_json()
+    if todo:
+        return jsonify(todo.to_json())
+    return jsonify(todo)
