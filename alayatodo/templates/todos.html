@@ -46,6 +46,8 @@
                     </td>
                     <td>
                         <form method="post" action="{{ url_for('todo_delete', id=todo.id) }}">
+                            <input type="hidden" value="{{ paginator.current }}" name="page">
+                            <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
                             <button type="submit" class="btn btn-xs btn-danger"><span
                                     class="glyphicon glyphicon-remove glyphicon-white"></span></button>
                         </form>
@@ -61,17 +63,17 @@
                                 {% for pr in paginator[k] %}
                                     <a class="paginator-page"
                                        href="/todo?page={{ pr }}&quantity={{ paginator.quantity }}">
-                                        {{ pr  }}</a>
+                                        {{ pr }}</a>
                                 {% endfor %}
                             {% endif %}
                             {% if k == 'current' %}
-                                <a href="#" class="paginator-current">{{ paginator[k]  }}</a>
+                                <a href="#" class="paginator-current">{{ paginator[k] }}</a>
                             {% endif %}
                             {% if k == 'next_' %}
                                 {% for nx in paginator[k] %}
                                     <a class="paginator-page"
                                        href="/todo?page={{ nx }}&quantity={{ paginator.quantity }}">
-                                        {{ nx  }}</a>
+                                        {{ nx }}</a>
                                 {% endfor %}
                             {% endif %}
                         {% endfor %}
