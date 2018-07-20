@@ -1,5 +1,9 @@
 from flask import g
-from .core import MessageType
+
+
+class MessageType:
+    Error = 1
+    Information = 2
 
 
 def add_validation_message(message):

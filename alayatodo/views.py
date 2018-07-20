@@ -1,7 +1,6 @@
-import json
-
-from alayatodo import app
-from .core import TodoManager, logged_in
+from . import app
+from .core import TodoManager, logged_in, UserManager
+from .validators import MessageType
 from flask import (
     g,
     redirect,
@@ -9,8 +8,6 @@ from flask import (
     request,
     session
 )
-
-from .core import MessageType
 
 
 def get_pagination():
@@ -50,12 +47,10 @@ def login_POST():
     username = request.form.get('username')
     password = request.form.get('password')
 
-    sql = "SELECT * FROM users WHERE username = '%s' AND password = '%s'"
-    print sql % (username, password)
-    cur = g.db.execute(sql % (username, password))
-    user = cur.fetchone()
+    user = UserManager.authenticate(username, password)
+
     if user:
-        session['user'] = dict(user)
+        session['user'] = user.to_json()
         session['logged_in'] = True
         return redirect('/todo')
 
@@ -127,4 +122,4 @@ def complete_todo(id):
 @logged_in
 def todo_to_json(id):
     todo = TodoManager.get_one_by_id(id)
-    return json.dumps(dict(todo))
+    return todo.to_json()

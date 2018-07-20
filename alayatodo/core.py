@@ -1,38 +1,42 @@
 from flask import session, redirect, g
+from .models import db, User, Todo
 from functools import wraps
+from werkzeug.security import check_password_hash
 
 
-class MessageType:
-    Error = 1
-    Information = 2
+class UserManager:
+    @staticmethod
+    def authenticate(username, password):
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password, password):
+            return user
+        return None
 
 
 class TodoManager:
 
     @staticmethod
     def get_one_by_id(id):
-        cur = g.db.execute("SELECT * FROM todos WHERE id ='%s'" % id)
-        todo = cur.fetchone()
+        todo = Todo.query.get_or_404(id)
         return todo
 
     @staticmethod
     def get_all():
-        cur = g.db.execute("SELECT * FROM todos")
-        todos = cur.fetchall()
+        todos = Todo.query.all()
         return todos
 
     @staticmethod
     def delete_by_id(id):
-        g.db.execute("DELETE FROM todos WHERE id ='%s'" % id)
-        g.db.commit()
+        todo = Todo.query.get_or_404(id)
+        db.session.delete(todo)
+        db.session.commit()
 
     @staticmethod
     def insert(description):
-        g.db.execute(
-            "INSERT INTO todos (user_id, description) VALUES ('%s', '%s')"
-            % (session['user']['id'], description)
-        )
-        g.db.commit()
+        userid = session['user']['id']
+        todo = Todo(description=description, user_id=userid)
+        db.session.add(todo)
+        db.session.commit()
 
     @staticmethod
     def uncomplete(id):
@@ -44,23 +48,20 @@ class TodoManager:
 
     @staticmethod
     def _update_completed(id, value):
-        g.db.execute(
-            "UPDATE todos SET completed = %s WHERE id = '%s'" % (value, id)
-        )
-        g.db.commit()
+        todo = Todo.query.get_or_404(id)
+        todo.completed = value
+        db.session.commit()
 
     @staticmethod
     def paginate(page, quantity):
         pivot = page * quantity
-        cur = g.db.execute("SELECT * FROM todos ORDER BY id LIMIT '%s', '%s'" % (pivot, quantity))
-        todos = cur.fetchall()
+        todos = Todo.query.order_by(Todo.id).limit(quantity).offset(pivot)
         return todos
 
     @staticmethod
     def count():
-        cur = g.db.execute("SELECT COUNT(*) FROM todos")
-        todos = cur.fetchone()[0]
-        return todos
+        count = Todo.query.count()
+        return count
 
 
 def logged_in(f):
