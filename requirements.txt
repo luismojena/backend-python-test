@@ -1,3 +1,9 @@
-Flask
-Jinja2
-docopt
+click==6.7
+docopt==0.6.2
+Flask==1.0.2
+Flask-SQLAlchemy==2.3.2
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+SQLAlchemy==1.2.10
+Werkzeug==0.14.1
