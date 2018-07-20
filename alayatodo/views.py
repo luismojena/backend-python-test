@@ -18,13 +18,21 @@ def get_pagination():
     total = TodoManager.count()
     prev_ = [i for i in range(page - 1, page - 3, -1) if i >= 0]
     prev_.reverse()
+    last = total / quantity
+    if total % quantity == 0:
+        next = page + 1 if page < last - 1 else page
+        next_ = [i for i in range(page + 1, page + 3) if i < last]
+        last = last - 1
+    else:
+        next = page + 1 if page < last else page
+        next_ = [i for i in range(page + 1, page + 3) if i <= last]
     paginator = {
         'prev': page - 1 if page > 0 else page,
-        'last': total / quantity,
+        'last': last,
         'current': page,
-        'next': page + 1 if page < total / quantity else page,
+        'next': next,
         'prev_': prev_,
-        'next_': [i for i in range(page + 1, page + 3) if i <= total / quantity],
+        'next_': next_,
         'quantity': quantity
     }
 

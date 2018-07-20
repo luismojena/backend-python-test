@@ -82,8 +82,8 @@
                             {% endif %}
                         {% endfor %}
                         ...
-                        <a href="/todo?page={{ paginator.last }}&quantity={{ paginator.quantity }}">Last</a>
                         <a href="/todo?page={{ paginator.next }}&quantity={{ paginator.quantity }}">Next</a>
+                        <a href="/todo?page={{ paginator.last }}&quantity={{ paginator.quantity }}">Last</a>
                     </div>
                 </td>
                 <td colspan="1">
