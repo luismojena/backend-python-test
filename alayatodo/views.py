@@ -112,14 +112,16 @@ def todo_delete(id):
 @logged_in
 def uncomplete_todo(id):
     TodoManager.uncomplete(id)
-    return redirect(request.referrer)
+    todos, paginator = get_pagination()
+    return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
 @app.route('/todo/complete/<id>', methods=['POST'])
 @logged_in
 def complete_todo(id):
     TodoManager.complete(id)
-    return redirect(request.referrer)
+    todos, paginator = get_pagination()
+    return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
 @app.route('/todo/<id>/json', methods=['GET'])

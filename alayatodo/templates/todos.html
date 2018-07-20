@@ -36,10 +36,14 @@
                     <td>
                         {% if todo.completed == 1 %}
                             <form method="post" action="{{ url_for('uncomplete_todo', id=todo.id) }}">
+                                <input type="hidden" value="{{ paginator.current }}" name="page">
+                                <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
                                 <button type="submit" class="btn btn-xs btn-danger">Uncomplete</button>
                             </form>
                         {% else %}
                             <form method="post" action="{{ url_for('complete_todo', id=todo.id) }}">
+                                <input type="hidden" value="{{ paginator.current }}" name="page">
+                                <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
                                 <button type="submit" class="btn btn-xs btn-success">Complete</button>
                             </form>
                         {% endif %}
