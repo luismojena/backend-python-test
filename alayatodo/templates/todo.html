@@ -8,6 +8,7 @@
             <th>User</th>
             <th>Description</th>
             <th>Completed</th>
+            <th>View JSON</th>
             <th></th>
             <tr>
                 <td>{{ todo.id }}</td>
@@ -15,14 +16,17 @@
                 <td>{{ todo.description }}</td>
                 <td>
                     {% if todo.completed == 1 %}
-                            <form method="post" action="{{ url_for('uncomplete_todo', id=todo.id) }}">
-                                <button type="submit" class="btn btn-xs btn-danger">Uncomplete</button>
-                            </form>
-                        {% else %}
-                            <form method="post" action="{{ url_for('complete_todo', id=todo.id) }}">
-                                <button type="submit" class="btn btn-xs btn-success">Complete</button>
-                            </form>
-                        {% endif %}
+                        <form method="post" action="{{ url_for('uncomplete_todo', id=todo.id) }}">
+                            <button type="submit" class="btn btn-xs btn-danger">Uncomplete</button>
+                        </form>
+                    {% else %}
+                        <form method="post" action="{{ url_for('complete_todo', id=todo.id) }}">
+                            <button type="submit" class="btn btn-xs btn-success">Complete</button>
+                        </form>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('todo_to_json', id=todo.id) }}" class="btn btn-xs btn-success">View JSON</a>
                 </td>
                 <td>
                     <form method="post" action="{{ url_for('todo_delete', id=todo.id) }}">
