@@ -16,10 +16,13 @@ class User(db.Model):
         return '<User %s (%s)>' % (self.username, self.id)
 
     def to_json(self):
-        return json.dumps({
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        return {
             'id': self.id,
             'username': self.username
-        })
+        }
 
 
 class Todo(db.Model):
@@ -33,9 +36,12 @@ class Todo(db.Model):
         return '<Todo desc: %s (%s)>' % (self.description, self.id)
 
     def to_json(self):
-        return json.dumps({
+        return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        return {
             'id': self.id,
             'description': self.description,
             'completed': self.description,
             'user_id': self.user_id
-        })
+        }

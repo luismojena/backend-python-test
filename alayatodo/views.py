@@ -50,7 +50,7 @@ def login_POST():
     user = UserManager.authenticate(username, password)
 
     if user:
-        session['user'] = user.to_json()
+        session['user'] = user.to_dict()
         session['logged_in'] = True
         return redirect('/todo')
 
@@ -98,8 +98,11 @@ def todos_POST():
 @app.route('/todo/<id>', methods=['POST'])
 @logged_in
 def todo_delete(id):
-    TodoManager.delete_by_id(id)
-    g.messages.append({'text': 'Todo removed correctly.', 'type': MessageType.Information})
+    ok_flag = TodoManager.delete_by_id(id)
+    if ok_flag:
+        g.messages.append({'text': 'Todo removed correctly.', 'type': MessageType.Information})
+    else:
+        g.messages.append({'text': 'You do not have permissions to remove that todo.', 'type': MessageType.Error})
     todos, paginator = get_pagination()
     return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
