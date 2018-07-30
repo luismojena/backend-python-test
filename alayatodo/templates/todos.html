@@ -31,22 +31,22 @@
                     <td>
                         {% if todo.completed == 1 %}
                             <form method="post" action="{{ url_for('uncomplete_todo', id=todo.id) }}">
-                                <input type="hidden" value="{{ paginator.current }}" name="page">
-                                <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
+                                <input type="hidden" value="" name="page">
+                                <input type="hidden" value="" name="quantity">
                                 <button type="submit" class="btn btn-xs btn-danger">Uncomplete</button>
                             </form>
                         {% else %}
                             <form method="post" action="{{ url_for('complete_todo', id=todo.id) }}">
-                                <input type="hidden" value="{{ paginator.current }}" name="page">
-                                <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
+                                <input type="hidden" value="" name="page">
+                                <input type="hidden" value="" name="quantity">
                                 <button type="submit" class="btn btn-xs btn-success">Complete</button>
                             </form>
                         {% endif %}
                     </td>
                     <td>
                         <form method="post" action="{{ url_for('todo_delete', id=todo.id) }}">
-                            <input type="hidden" value="{{ paginator.current }}" name="page">
-                            <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
+                            <input type="hidden" value="" name="page">
+                            <input type="hidden" value="" name="quantity">
                             <button type="submit" class="btn btn-xs btn-danger"><span
                                     class="glyphicon glyphicon-remove glyphicon-white"></span></button>
                         </form>
@@ -86,7 +86,10 @@
                         <form method="get" action="{{ url_for('todos') }}" id="paginator-selector-form">
                             <select name="quantity" id="paginator-selector">
                                 {% for i in [5,10,20,50,100] %}
-                                    <option value="{{ i }}" {% if paginator.quantity == i %}selected{% endif %}>{{ i }}</option>
+                                    <option value="{{ i }}"
+                                            {% if paginator.quantity == i %}selected{% endif %}>
+                                        {{ i }}
+                                    </option>
                                 {% endfor %}
                             </select>
                         </form>
@@ -107,8 +110,8 @@
                     <td colspan="3">
                         <input type="textbox" name="description" class="small-6 small-center"
                                placeholder="Description...">
-                        <input type="hidden" value="{{ paginator.current }}" name="page">
-                        <input type="hidden" value="{{ paginator.quantity }}" name="quantity">
+                        <input type="hidden" value="" name="page">
+                        <input type="hidden" value="" name="quantity">
                     </td>
                     <td>
                         <button type="submit" class="btn btn-sm btn-primary">Add</button>
@@ -117,4 +120,8 @@
             </tr>
         </table>
     </div>
+    <script>
+        $('input[name=quantity]').val('{{ paginator.quantity }}');
+        $('input[name=page]').val('{{ paginator.current }}');
+    </script>
 {% endblock %}
