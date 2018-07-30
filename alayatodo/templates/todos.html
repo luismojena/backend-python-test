@@ -23,13 +23,8 @@
                     <td>{{ todo.id }}</td>
                     <td>{{ todo.user_id }}</td>
                     <td>
-                        <a
-                                {% if todo.completed == 1 %}
-                                    style="text-decoration: line-through;"
-                                {% else %}
-                                    style="text-decoration: none;"
-                                {% endif %}
-                                    href="{{ url_for('todo', id=todo.id) }}">
+                        <a class="{{ "todo-completed" if todo.completed == 1 else "todo-uncompleted" }}"
+                           href="{{ url_for('todo', id=todo.id) }}">
                             {{ todo.description }}
                         </a>
                     </td>
@@ -90,11 +85,9 @@
                     <div class="small-6 small-center">
                         <form method="get" action="{{ url_for('todos') }}" id="paginator-selector-form">
                             <select name="quantity" id="paginator-selector">
-                                <option value="5" {% if paginator.quantity == 5 %}selected{% endif %}>5</option>
-                                <option value="10" {% if paginator.quantity == 10 %}selected{% endif %}>10</option>
-                                <option value="20" {% if paginator.quantity == 20 %}selected{% endif %}>20</option>
-                                <option value="50" {% if paginator.quantity == 50 %}selected{% endif %}>50</option>
-                                <option value="100" {% if paginator.quantity == 100 %}selected{% endif %}>100</option>
+                                {% for i in [5,10,20,50,100] %}
+                                    <option value="{{ i }}" {% if paginator.quantity == i %}selected{% endif %}>{{ i }}</option>
+                                {% endfor %}
                             </select>
                         </form>
                     </div>
@@ -103,9 +96,9 @@
             <tr>
                 <div>
                     <ul class="errors">
-                        {% for error in messages %}
-                            {% if error.type == 1 %}
-                                <li>{{ error.text }}</li>
+                        {% for message in messages %}
+                            {% if message.type == 1 %}
+                                <li>{{ message.text }}</li>
                             {% endif %}
                         {% endfor %}
                     </ul>

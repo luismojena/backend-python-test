@@ -18,3 +18,11 @@ body {
 .paginator-page {
     text-decoration: none;
 }
+
+.todo-completed {
+    text-decoration: line-through;
+}
+
+.todo-uncompleted {
+    text-decoration: none;
+}
