@@ -26,9 +26,8 @@ class TodoManager:
         return todos
 
     @staticmethod
-    def delete_by_id(id):
+    def delete_by_id(id, user_id):
         todo = Todo.query.get_or_404(id)
-        user_id = session['user']['id']
         if todo.user_id == user_id:
             db.session.delete(todo)
             db.session.commit()
@@ -36,9 +35,8 @@ class TodoManager:
         return False
 
     @staticmethod
-    def insert(description):
-        userid = session['user']['id']
-        todo = Todo(description=description, user_id=userid)
+    def insert(description, user_id):
+        todo = Todo(description=description, user_id=user_id)
         db.session.add(todo)
         db.session.commit()
 
@@ -57,15 +55,13 @@ class TodoManager:
         db.session.commit()
 
     @staticmethod
-    def paginate(page, quantity):
+    def paginate(page, quantity, user_id):
         pivot = page * quantity
-        user_id = session['user']['id']
         todos = Todo.query.filter_by(user_id=user_id).order_by(Todo.id).limit(quantity).offset(pivot)
         return todos
 
     @staticmethod
-    def count():
-        user_id = session['user']['id']
+    def count(user_id):
         count = Todo.query.filter_by(user_id=user_id).count()
         return count
 

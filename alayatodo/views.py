@@ -14,8 +14,9 @@ from flask import (
 def get_pagination():
     page = int(request.values.get('page', 0))
     quantity = int(request.values.get('quantity', 5))
-    todos = TodoManager.paginate(page, quantity)
-    total = TodoManager.count()
+    user_id = session['user']['id']
+    todos = TodoManager.paginate(page, quantity, user_id)
+    total = TodoManager.count(user_id)
     prev_ = [i for i in range(page - 1, page - 3, -1) if i >= 0]
     prev_.reverse()
     last = total / quantity
@@ -93,10 +94,11 @@ def todos():
 @app.route('/todo/', methods=['POST'])
 @logged_in
 def todos_POST():
+    user_id = session['user']['id']
     description = g.validators.validate_not_empty_field(request.form.get('description', ''), 'description')
 
     if description is not None:
-        TodoManager.insert(description)
+        TodoManager.insert(description, user_id)
         g.messages.append({'text': 'Todo added correctly.', 'type': MessageType.Information})
 
     todos, paginator = get_pagination()
@@ -107,7 +109,8 @@ def todos_POST():
 @app.route('/todo/<id>', methods=['POST'])
 @logged_in
 def todo_delete(id):
-    ok_flag = TodoManager.delete_by_id(id)
+    user_id = session['user']['id']
+    ok_flag = TodoManager.delete_by_id(id, user_id)
     if ok_flag:
         g.messages.append({'text': 'Todo removed correctly.', 'type': MessageType.Information})
     else:
