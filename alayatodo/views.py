@@ -6,6 +6,7 @@ from flask import (
     g,
     redirect,
     render_template,
+    make_response,
     request,
     session,
     jsonify
@@ -155,7 +156,8 @@ def complete_todo(id):
 @app.route('/todo/<id>/json', methods=['GET'])
 @logged_in
 def todo_to_json(id):
+    from itsdangerous import json as _json
     todo = TodoManager.get_one_by_id(id)
     if todo:
         return jsonify(todo.to_json())
-    return jsonify(todo)
+    return make_response(_json.dumps(todo), 404, {'Content-Type': 'application/json'})
