@@ -1,6 +1,6 @@
 from . import app
 from .core import TodoManager, logged_in, UserManager
-from .validators import MessageType
+from .validators import MessageType, add_information_message, add_validation_message
 from .core import get_loggedin_user_id, get_pagination_parameters
 from flask import (
     g,
@@ -96,11 +96,16 @@ def todos():
 def todos_POST():
     page, quantity = get_pagination_parameters(request)
     user_id = get_loggedin_user_id(session)
-    description = g.validators.validate_not_empty_field(request.form.get('description', ''), 'description')
 
-    if description is not None:
+    field_name = 'description'
+    description = request.form.get(field_name, '')
+    valid, message = g.validators.validate_not_empty_field(description, field_name)
+
+    if valid:
         TodoManager.insert(description, user_id)
-        g.messages.append({'text': 'Todo added correctly.', 'type': MessageType.Information})
+        add_information_message('Todo added correctly.')
+    else:
+        add_validation_message(message)
 
     todos, paginator = get_pagination(page, quantity, user_id)
 
