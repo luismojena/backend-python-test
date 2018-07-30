@@ -160,4 +160,6 @@ def todo_to_json(id):
     todo = TodoManager.get_one_by_id(id)
     if todo:
         return jsonify(todo.to_json())
-    return make_response(_json.dumps(todo), 404, {'Content-Type': 'application/json'})
+    return make_response(_json.dumps({'message': 'Todo with "id" %s does not exists' % id}),
+                         404,
+                         {'Content-Type': 'application/json'})
