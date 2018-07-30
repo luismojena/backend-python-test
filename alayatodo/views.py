@@ -1,6 +1,7 @@
 from . import app
 from .core import TodoManager, logged_in, UserManager
 from .validators import MessageType
+from .core import get_loggedin_user_id, get_pagination_parameters
 from flask import (
     g,
     redirect,
@@ -11,10 +12,7 @@ from flask import (
 )
 
 
-def get_pagination():
-    page = int(request.values.get('page', 0))
-    quantity = int(request.values.get('quantity', 5))
-    user_id = session['user']['id']
+def get_pagination(page, quantity, user_id):
     todos = TodoManager.paginate(page, quantity, user_id)
     total = TodoManager.count(user_id)
     prev_ = [i for i in range(page - 1, page - 3, -1) if i >= 0]
@@ -86,7 +84,9 @@ def todo(id):
 @app.route('/todo/', methods=['GET'])
 @logged_in
 def todos():
-    todos, paginator = get_pagination()
+    page, quantity = get_pagination_parameters(request)
+    user_id = get_loggedin_user_id(session)
+    todos, paginator = get_pagination(page, quantity, user_id)
     return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
@@ -94,14 +94,15 @@ def todos():
 @app.route('/todo/', methods=['POST'])
 @logged_in
 def todos_POST():
-    user_id = session['user']['id']
+    page, quantity = get_pagination_parameters(request)
+    user_id = get_loggedin_user_id(session)
     description = g.validators.validate_not_empty_field(request.form.get('description', ''), 'description')
 
     if description is not None:
         TodoManager.insert(description, user_id)
         g.messages.append({'text': 'Todo added correctly.', 'type': MessageType.Information})
 
-    todos, paginator = get_pagination()
+    todos, paginator = get_pagination(page, quantity, user_id)
 
     return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
@@ -109,29 +110,40 @@ def todos_POST():
 @app.route('/todo/<id>', methods=['POST'])
 @logged_in
 def todo_delete(id):
-    user_id = session['user']['id']
+    page, quantity = get_pagination_parameters(request)
+    user_id = get_loggedin_user_id(session)
+
     ok_flag = TodoManager.delete_by_id(id, user_id)
     if ok_flag:
         g.messages.append({'text': 'Todo removed correctly.', 'type': MessageType.Information})
     else:
         g.messages.append({'text': 'You do not have permissions to remove that todo.', 'type': MessageType.Error})
-    todos, paginator = get_pagination()
+
+    todos, paginator = get_pagination(page, quantity, user_id)
     return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
 @app.route('/todo/uncomplete/<id>', methods=['POST'])
 @logged_in
 def uncomplete_todo(id):
+    page, quantity = get_pagination_parameters(request)
+    user_id = get_loggedin_user_id(session)
+
     TodoManager.uncomplete(id)
-    todos, paginator = get_pagination()
+
+    todos, paginator = get_pagination(page, quantity, user_id)
     return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 
 @app.route('/todo/complete/<id>', methods=['POST'])
 @logged_in
 def complete_todo(id):
+    page, quantity = get_pagination_parameters(request)
+    user_id = get_loggedin_user_id(session)
+
     TodoManager.complete(id)
-    todos, paginator = get_pagination()
+
+    todos, paginator = get_pagination(page, quantity, user_id)
     return render_template('todos.html', todos=todos, messages=g.messages, paginator=paginator)
 
 

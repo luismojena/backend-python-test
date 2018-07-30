@@ -74,3 +74,14 @@ def logged_in(f):
         return f(*args, **kwargs)
 
     return _wrapper
+
+
+def get_pagination_parameters(request):
+    page = int(request.values.get('page', 0))
+    quantity = int(request.values.get('quantity', 5))
+    return page, quantity
+
+
+def get_loggedin_user_id(session_):
+    user_id = session_['user']['id']
+    return user_id
